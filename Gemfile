@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
+ruby "2.0.0"
 
 gem 'rails', '4.2.3'
-gem 'sqlite3'
+
 gem 'jquery-rails'
 gem 'coffee-rails'
 gem 'haml'
@@ -11,6 +12,11 @@ gem 'sass', '3.2.19'
 
 group :development, :test do
 	gem 'rspec-rails'
+	gem 'sqlite3'
+end
+
+group :production do
+  # gem 'pg'
 end
 
 
