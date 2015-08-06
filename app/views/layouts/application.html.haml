@@ -1,0 +1,294 @@
+%html
+  %head
+    - @title = 'Money & Groups'
+    %title
+      = @title
+    = stylesheet_link_tag :application, :media => "all"
+    = javascript_include_tag :application
+    = csrf_meta_tags
+  %body{"ng-app" => "money_groups", "ng-controller" => "sessionsController"}
+    .navbar.navbar-default.navbar-static-top
+      .navbar-inner
+        .container-fluid
+          .row-fluid
+            %span.pull-right{'ng-show' => "cookies.get('user_name')"}
+              %div
+                You have signed in as
+                %strong
+                  {{cookies.get('user_name')}}
+                (available funds: {{user.money | monetary}}).
+              %div
+                Want to
+                = succeed '?' do
+                  %a{'ng-click' => "logout()"} sign out
+            %h1
+              = @title + '.'
+
+    .container-full
+      .col-xs-1
+
+      %div.col-xs-10
+        .row{'ng-show' => 'user.loggedIn'}
+          .row
+            %div.col-xs-12.well{'ng-show' => 'user.isAdmin', 'ng-controller' => 'reportsController'}
+              %h2 Administrator
+              %div You have administrator rights. For available actions please see panels below.
+              %div
+                Jump to:
+                = succeed ',' do
+                  %a{href:'#users'} users panel
+                = succeed ',' do
+                  %a{href:'#groups'} groups panel
+                = succeed ',' do
+                  %a{href:'#new-group'} creating new group
+                = succeed '.' do
+                  %a{href:'#reports'} reports panel
+
+
+
+          .row
+            %div.col-xs-5{'ng-show' => 'user.isAdmin', 'ng-controller' => 'usersController'}
+              .row
+                .well
+                  %a{name: :users}
+                  %h2 Users panel
+                  %ul
+                    %div.well{'ng-repeat' => "(id, user) in users"}
+                      %div
+                        %h3
+                          {{id}}. {{user.name}}
+                      %div
+                        %span{'ng-if' => 'user.admin'} admin,
+                        age: {{user.age}}, money: {{user.money | monetary}}, sex: {{user.sex}}
+                      %div
+                        %a{'ng-click' => 'editing[id] = !editing[id]'} edit user
+                      %div{'ng-show' => 'editing[id]'}
+                        %hr
+                        %ng-form{name: 'userForm_{{id}}'}
+                          = render partial: "user_form_input_short", locals: {form: 'userForm_{{id}}', id: 'id', type: :update, input_type: :text, name: :name}
+                          = render partial: "user_form_input_short", locals: {form: 'userForm_{{id}}', id: 'id', type: :update, input_type: :number, name: :age, input_params: {:min => 1, :step => 1}}
+                          = render partial: "user_form_input_short", locals: {form: 'userForm_{{id}}', id: 'id', type: :update, input_type: :number, name: :money, input_params: {:min => 0.00, :step => 0.01}}
+                          = render partial: "user_form_input_short", locals: {form: 'userForm_{{id}}', id: 'id', type: :update, input_type: :select, name: :sex, options: [:unknown, :male, :female]}
+
+                          .form-group.required{'ng-class' => "{'has-error': 'userForm_{{id}}.admin.$invalid'}"}
+                            %label{:for => 'user-admin'} Admin?
+                            %input{id: 'user-admin', type: 'checkbox', required: :required, checked: :checked,
+                                                'ng-model' => "usersToEdit[id].admin", :name => 'admin'}
+                          %button.btn.btn-default{:type => "submit", 'ng-click' => "editUser(id)"}
+                            Edit
+                          %div.text-error{'ng-show' => "usersErrorsWhileEditing[id]"}
+                            {{usersErrorsWhileEditing[id]}}
+                          %div.text-success{'ng-show' => 'edited[id]'}
+                            You have successfully updated the user!
+
+
+            %div.col-xs-1{'ng-show' => 'user.isAdmin'}
+
+            %div{'ng-show' => 'user.loggedIn', 'ng-controller' => 'groupsController',
+                      'ng-class' => "{'col-xs-12': !user.isAdmin, 'col-xs-6': user.isAdmin}"}
+              .row
+                .well
+                  %a{name: :groups}
+                  %h2 Groups panel
+                  %ul
+                    %div{'ng-repeat' => "(id, group) in groups"}
+                      %ng-form{name: 'groupForm_{{id}}'}
+                        %fieldset{'ng-disabled' => 'processing'}
+                          %li.well
+                            %strong
+                              {{group.name}}
+                            (money: {{group.money | monetary}}).
+                            %span{'ng-hide' => 'group.is_user_in_group'}
+                              %a{'ng-click' => "joinGroup(id)"} Join
+                            %span.text-error{'ng-show' => 'groups[id].membershipError'}
+                              Error occurred while updating membership
+                              %span{'ng-hide' => 'groups[id].membershipError === true'}
+                                = precede ':' do
+                                  {{groups[id].membershipError}}
+                            %span{'ng-show' => 'group.is_user_in_group'}
+                              %a{'ng-click' => "leaveGroup(id)"} Leave
+                              %div
+                                Deposit money:
+                                %input{type: :number, min: 0.01, step: 0.01, placeholder: 'Amount in dollars', 'ng-model' => 'amountsToChange.deposit[id]'}
+                                %button{:type => "submit", 'ng-click' => "depositToGroup(id)"}
+                                  Deposit
+                              %div
+                                Withdraw money:
+                                %input{type: :number, min: 0.01, step: 0.01, placeholder: 'Amount in dollars', 'ng-model' => 'amountsToChange.withdraw[id]'}
+                                %button{:type => "submit", 'ng-click' => "withdrawFromGroup(id)"}
+                                  Withdraw
+                              %div.text-error{'ng-show' => 'groups[id].moneyError'}
+                                Error:
+                                %span{'ng-show' => "groups[id].moneyError == 'zero_or_negative_amount'"}
+                                  amount should be $0.01 or greater
+                                %span{'ng-show' => "groups[id].moneyError == 'not_enough_money_user'"}
+                                  you do not have enough money
+                                %span{'ng-show' => "groups[id].moneyError == 'not_enough_money_group'"}
+                                  the group you selected does not have this amount of money
+                                %span{'ng-show' => "groups[id].moneyError == 'user_not_in_group'"}
+                                  you are not in the group
+                                %span{'ng-show' => "groups[id].moneyError == 'group_not_found'"}
+                                  group not found in the database
+                                %span{'ng-show' => "groups[id].moneyError == 'unknown_error'"}
+                                  unknown error. Maybe try later?
+                                  %span{'ng-show' => 'groups[id].moneyErrorDetailed'}
+                                    {{groups[id].moneyErrorDetailed}}
+                              %div.text-success{'ng-show' => 'groups[id].moneySuccess'}
+                                You have successfully {{lastOperationVerb}} {{lastOperationAmount | monetary}}!
+                            %div{'ng-show' => 'user.isAdmin'}
+                              %div
+                                %a{'ng-click' => 'editing[id] = !editing[id]'}
+                                  Edit name or amount in group
+                              %div{'ng-show' => 'editing[id]'}
+                                %hr
+                                %ng-form{name: 'userForm_{{id}}'}
+                                  .form-group.required
+                                    %label{:for => 'group-name-{{id}}'} Group name
+                                    %input.form-control{id: 'group-name-{{id}}', required: :required, 'ng-model' => "groupsToEdit[id].name", placeholder: 'Group name'}
+                                    %label{:for => 'group-money-{{id}}'} Amount of money (in dollars)
+                                    %input.form-control{id: 'group-money-{{id}}', required: :required, type: :number, 'ng-model' => "groupsToEdit[id].money", :min => 0.00, :step => 0.01, placeholder: 'Amount'}
+                                    %button.btn.btn-default{:type => "submit", 'ng-click' => "editGroup(id)", 'ng-disabled' => "groupsToEdit[id].name == undefined || groupsToEdit[id].money == undefined"}
+                                      Edit
+                                  %div.text-error{'ng-show' => "groupsErrorsWhileEditing[id]"}
+                                    {{groupsErrorsWhileEditing[id]}}
+                                  %div.text-success{'ng-show' => 'edited[id]'}
+                                    You have successfully updated the group!
+
+
+              .row{'ng-show' => 'user.isAdmin'}
+                .well
+                  %a{name: 'new-group'}
+                  %h2 Want to create a new group?
+                  Just give it a name!
+                  %form
+                    %input.form-control{'ng-model' => 'newGroupName', placeholder: 'Name'}
+                    %button.btn.btn-default{:type => "submit", 'ng-click' => "createGroup()",
+                                            'ng-disabled' => '!newGroupName'}
+                      Create
+                  %div.text-success{'ng-show' => 'newGroupCreated'}
+                    You have successfully created a group!
+                  %div.text-error{'ng-show' => 'newGroupError == "name_already_taken"'}
+                    The group with this name already exists!
+                  %div.text-error{'ng-show' => 'newGroupError && newGroupError != "name_already_taken"'}
+                    Error occurred while creating a group: {{newGroupError}}.
+
+
+
+        .row{'ng-show' => 'user.loggedIn && user.isAdmin', 'ng-controller' => 'reportsController'}
+          .well.col-xs-5
+            %a{name: 'reports'}
+            %h2 Choose a report
+            .well
+              %form
+                %select{'ng-model' => 'groupToMakeReportFor'}
+                  %option.form-control{'value' => '{{id}}', 'ng-repeat' => "(id, group) in groups"}
+                    {{group}}
+                %button.btn.btn-default{:type => "submit", 'ng-click' => "newReportByGroup()"}
+                  See report by group
+
+            .well
+              %form
+                %select{'ng-model' => 'userToMakeReportFor'}
+                  %option.form-control{'value' => '{{id}}', 'ng-repeat' => "(id, user) in users"}
+                    {{user}}
+                %button.btn.btn-default{:type => "submit", 'ng-click' => "newReportByUser()"}
+                  See report by user
+                %div.text-error{'ng-show' => 'errors.users == "user_not_found"'}
+                  User not found.
+                %div.text-error{'ng-show' => 'errors.users && errors.users != "user_not_found"'}
+                  {{errors.users}}
+
+
+            .well
+              %button.btn.btn-default{:type => "submit", 'ng-click' => "newTotalReport()"}
+                See total report
+          .col-xs-1
+          .well.col-xs-6{'ng-show' => 'reportShown'}
+            %h2
+              Detailed report
+              %span{'ng-show' => 'reportShown == "user"'} (by a user)
+              %span{'ng-show' => 'reportShown == "group"'} (by a group)
+              %span{'ng-show' => 'reportShown == "total"'} (total)
+
+            %span{'ng-show' => 'reports.users || reports.groups || reports.total'}
+              %table.table
+                %tr
+                  %th Id
+                  %th Action
+                  %th Amount
+                  %th Time
+                  %th User
+                  %th Group
+                %tr{'ng-repeat' => "row in reports[reportShown + ((reports.users || reports.groups) ? 's' : '')]", 'ng-class' => "row.type"}
+                  %th
+                    {{row.id}}
+                  %th
+                    {{row.type}}
+                  %th
+                    {{row.money | monetary}}
+                  %th
+                    {{row.created_at | date: 'dd.MM.yyyy HH:mm:ss'}}
+                  %th
+                    {{row.user.name}}
+                  %th
+                    {{row.group.name}}
+
+
+
+
+
+
+        %div.text-center{'ng-hide' => 'user.loggedIn'}
+          You can
+          %a{"ng-click" => "signInDiv = !signInDiv; signUpDiv = false"}
+            sign in
+          or
+          %a{"ng-click" => "signUpDiv = !signUpDiv; signInDiv = false"}
+            sign up
+
+
+
+
+
+
+
+        .col-lg-6
+          %div.well{'ng-show' => "signInDiv && !user.loggedIn"}
+            %div Please provide your username and password.
+            - form_name = :sign_in_form
+            %form{name: form_name.to_s.camelcase(:lower)}
+              %fieldset{'ng-disabled' => 'status.login.processing'}
+                = render partial: "user_form_input", locals: {form: form_name, type: :login, input_type: :text, name: :name}
+                = render partial: "user_form_input", locals: {form: form_name, type: :login, input_type: :password, name: :password}
+              %button.btn.btn-default{:type => "submit", 'ng-click' => "login()",
+                                      'ng-disabled' => '!status.login.submitted && signInForm.$invalid',
+                                      'data-loading-text' => "Loading..."}
+                %span{'ng-hide' => "status.login.processing"} Sign in!
+                %span{'ng-show' => "status.login.processing"} Signing in...
+              .well.text-error{'ng-show' => 'user.errors.login.nameNotFound'}
+                User name not found.
+              .well.text-error{'ng-show' => 'user.errors.login.invalidPassword'}
+                Wrong password.
+              .well.text-error{'ng-show' => 'user.errors.login.unknown'}
+                Unknown error occured. Please reload the page and try again.
+
+        .col-lg-6
+          %div.well{'ng-show' => "signUpDiv && !user.loggedIn"}
+            %div{'ng-hide' => 'user.saved'}
+              %div Please provide us some information about yourself.
+              - form_name = :sign_up_form
+              %form{name: form_name.to_s.camelcase(:lower)}
+                %fieldset{'ng-disabled' => 'status.registration.processing'}
+                  = render partial: "user_form_input", locals: {form: form_name, type: :registration, input_type: :text, name: :name}
+                  = render partial: "user_form_input", locals: {form: form_name, type: :registration, input_type: :password, name: :password}
+                  = render partial: "user_form_input", locals: {form: form_name, type: :registration, input_type: :number, name: :age, input_params: {:min => 1, :step => 1}}
+                  = render partial: "user_form_input", locals: {form: form_name, type: :registration, input_type: :select, name: :sex, options: [:unknown, :male, :female]}
+                  %button.btn.btn-default{:type => "submit", 'ng-click' => "registration()",
+                                          'ng-disabled' => '!status.registration.submitted && signUpForm.$invalid',
+                                          'data-loading-text' => "Loading..."}
+                    %span{'ng-hide' => "status.registration.processing"} Sign up!
+                    %span{'ng-show' => "status.registration.processing"} Signing up...
+                .well.text-error{'ng-show' => 'user.errors.unknown'}
+                  Unknown error occured. Please reload the page and try again.
+            %div{'ng-show' => 'user.saved'}
+              Congratulations! You have been registered in our database.

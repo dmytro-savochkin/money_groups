@@ -1,11 +1,14 @@
 class GroupsController < ApplicationController
-	skip_before_action :authenticate_user_from_token!, only: [:index]
-	before_action :authenticate_admin_from_token!, only: [:create, :edit, :update, :report]
+	before_action :authenticate_admin_from_token!, only: [:create, :update, :report]
 
 
 	def index
-		render :json => {success: true, error: Group.all}
+		render :json => {
+		  success: true,
+			groups: Group.includes(:memberships).select('groups.*').with_is_user_joined_field(current_user.id)
+    }
 	end
+
 
 	def create
 		group = Group.new(name: params[:group][:name], money: 0.0)
@@ -14,16 +17,8 @@ class GroupsController < ApplicationController
 		else
 			render :json => {success: false, error: group.errors}
 		end
-	end
+  end
 
-	def edit
-		group = Group.find_by_id(params[:group_id])
-		if group
-			render :json => {success: true, group: group}
-		else
-			render :json => {success: false, group: :group_not_found}
-		end
-	end
 
 	def update
 		group = Group.find_by_id(params[:group_id])
@@ -84,12 +79,12 @@ class GroupsController < ApplicationController
 		case type
 			when :deposit
 				if current_user.money.to_f < money.to_f
-					render_not_enough_money
+					render_not_enough_money_user
 					return
 				end
 			when :withdraw
 				if group.money.to_f < money.to_f
-					render_not_enough_money
+					render_not_enough_money_group
 					return
 				end
 			else
@@ -107,7 +102,7 @@ class GroupsController < ApplicationController
 
 
 	def render_wrong_amount
-		render :json => {success: false, error: :wrong_amount}
+		render :json => {success: false, error: :zero_or_negative_amount}
 	end
 	def render_success
 		render :json => {success: true}
@@ -115,9 +110,12 @@ class GroupsController < ApplicationController
 	def render_group_not_found
 		render :json => {success: false, error: :group_not_found}
 	end
-	def render_not_enough_money
-		render :json => {success: false, error: :not_enough_money}
-	end
+	def render_not_enough_money_user
+		render :json => {success: false, error: :not_enough_money_user}
+  end
+  def render_not_enough_money_group
+    render :json => {success: false, error: :not_enough_money_group}
+  end
 	def render_user_not_in_group
 		render :json => {success: false, error: :user_not_in_group}
 	end

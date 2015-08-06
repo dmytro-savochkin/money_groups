@@ -3,8 +3,31 @@ class UsersController < ApplicationController
 
 
 	def index
-		@users = User.all
+    render :json => {success: true, users: User.all}
 	end
+
+
+	def show
+    render :json => {
+               success: true,
+               user: {
+                   name: current_user.name,
+                   age: current_user.age,
+                   sex: current_user.sex,
+                   money: current_user.money
+               }
+           }
+  end
+
+
+  def update
+    user = User.find_by_id(params[:user_to_edit][:id])
+    if user and user.update(params.require(:user_to_edit).permit(:name, :money, :sex, :age, :admin))
+      render :json => {success: true, user: user}
+    else
+      render :json => {success: false, error: user.nil? ? :user_not_found : user.errors}
+    end
+  end
 
 
 

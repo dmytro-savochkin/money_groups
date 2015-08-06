@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
-	protect_from_forgery with: :null_session, if: Proc.new { |c|
-		c.request.format == 'application/json' }
+	skip_before_action :verify_authenticity_token
+	# protect_from_forgery with: :null_session, if: Proc.new { |c|
+	# 	c.request.format == 'application/json' }
 
 	before_action :authenticate_user_from_token!
 
@@ -10,6 +11,9 @@ class ApplicationController < ActionController::Base
 
 	def authenticate_user_from_token!
 		if params[:user]
+      if params[:user].kind_of? String
+        params[:user] = JSON.parse params[:user]
+      end
 			user_id = params[:user][:id]
 			user_auth_token = params[:user][:authentication_token]
 		else
@@ -20,7 +24,7 @@ class ApplicationController < ActionController::Base
 		if user && Devise.secure_compare(user.authentication_token, user_auth_token)
 			sign_in(user, store: false)
 			user
-		else
+    else
 			render :json => {success: false, error: :invalid_token}
 			return
 		end
@@ -34,5 +38,10 @@ class ApplicationController < ActionController::Base
 			render :json => {success: false, error: :not_admin}
 			return
 		end
+	end
+
+
+	def render_no_params_sent
+		render :json => {success: false, error: :no_params_sent}
 	end
 end

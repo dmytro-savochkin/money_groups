@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
 	skip_before_action :authenticate_user_from_token!, only: [:create]
+	before_action :check_whether_params_empty
 
 
 	def create
@@ -16,7 +17,7 @@ class RegistrationsController < ApplicationController
 			user.save
 			render :json => {success: true, name: user.name}
 		else
-			render :json => {success: false, error: user.errors}
+			render :json => {success: false, errors: user.errors}
 		end
 	end
 
@@ -37,5 +38,12 @@ class RegistrationsController < ApplicationController
 		else
 			render :json => {success: false, error: user.errors}
 		end
+	end
+
+
+	private
+
+	def check_whether_params_empty
+		render_no_params_sent if params[:user].nil?
 	end
 end

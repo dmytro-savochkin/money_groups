@@ -1,0 +1,14 @@
+- input_params = {} if input_params.nil?
+.form-group.required{'ng-class' => "{'has-error': #{form.to_s.camelcase(:lower)}.#{name}.$invalid}"}
+  %label{:for => 'user-'+name.to_s}
+    = name.capitalize
+    %span.text-error{'ng-show' => "status.#{type}.submitted && #{form.to_s.camelcase(:lower)}.#{name}.$invalid"}
+      {{user.errors.#{name}}}
+  - field_attributes = {id: 'user-'+name.to_s, type: input_type, required: :required,
+                        :placeholder => name.capitalize, 'ng-model' => "usersToEdit[#{id}].#{name}", :name => name}
+  - if input_type == :select
+    %select.form-control.required{input_params, field_attributes}
+      - options.each do |option|
+        %option= option
+  - else
+    %input.form-control{input_params, field_attributes}

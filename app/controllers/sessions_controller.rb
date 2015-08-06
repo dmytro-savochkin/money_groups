@@ -14,12 +14,14 @@ class SessionsController < ApplicationController
 			if user.save
 				render :json => {
 						success: true,
-						auth_token: user.authentication_token,
+						authentication_token: user.authentication_token,
 						name: user.name,
-						id: user.id
+						id: user.id,
+						money: user.money,
+            admin: user.admin
 				}
 			else
-				render :json => {success: false, error: user.errors}
+				render :json => {success: false, errors: user.errors}
 			end
 		else
 			render :json => {success: false, error: :invalid_password}

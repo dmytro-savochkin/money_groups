@@ -1,0 +1,35 @@
+.form-group label {
+  position:relative;
+  margin-right:15px;
+}
+.form-group label:before {
+  position:absolute;
+  content:'*';
+  color:red;
+  left:-10px;
+  top:0;
+}
+.text-error {
+  color: red;
+}
+.text-success {
+  color: green;
+}
+ul {
+  padding-left: 20px;
+}
+a {
+  cursor: pointer;
+}
+tr.money_in {
+  background-color: lightblue;
+}
+tr.money_out {
+  background-color: darkcyan;
+}
+tr.user_in {
+  background-color: yellow;
+}
+tr.user_out {
+  background-color: coral;
+}

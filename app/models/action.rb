@@ -9,7 +9,7 @@ class Action < ActiveRecord::Base
 
 	def self.detailed_actions(actions)
 		ActiveSupport::JSON.decode(
-				actions.includes(:user, :group).to_json(:include => [:user, :group])
+				actions.order(created_at: :desc).includes(:user, :group).to_json(:include => [:user, :group])
 		).map do |a|
 			h = a.except('user_id', 'group_id').dup
 			h['user'].delete('authentication_token')

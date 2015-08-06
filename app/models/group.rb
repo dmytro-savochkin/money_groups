@@ -7,6 +7,11 @@ class Group < ActiveRecord::Base
 	validates_numericality_of :money, :greater_than_or_equal_to => 0.0
 
 
+	scope :with_is_user_joined_field, ->(user_id) { select("(SELECT COUNT(*) FROM memberships
+	  WHERE memberships.user_id = #{user_id.to_i} AND memberships.group_id = groups.id) as is_user_in_group ")
+	}
+
+
 	def deposit_or_withdraw_money(type, user, money)
 		case type
 			when :deposit

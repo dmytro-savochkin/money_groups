@@ -1,8 +1,8 @@
 names = ['Group 1', 'Test group']
 users = [
-		{name: 'Dmitry', money: 100.0, age: 24, sex: :male, password: 'testtest123', admin: true},
-		{name: 'Ivan', money: 10.0, age: 50, sex: :male, password: 'testtest123', admin: false},
-		{name: 'Marina', money: 500.0, age: 26, sex: :female, password: 'testtest123', admin: false}
+		{name: 'dmitry', money: 100.0, age: 24, sex: :male, password: 'testtest123', admin: false},
+		{name: 'ivan', money: 10.0, age: 50, sex: :unknown, password: 'testtest123', admin: false},
+		{name: 'admin', money: 500.0, age: 26, sex: :male, password: 'testtest123', admin: true}
 ]
 
 names.each do |name|
