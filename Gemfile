@@ -9,15 +9,13 @@ gem 'haml'
 gem 'devise'
 gem 'bower-rails'
 gem 'sass', '3.2.19'
+gem 'pg'
 
 group :development, :test do
 	gem 'rspec-rails'
 	gem 'sqlite3'
 end
 
-group :production do
-  # gem 'pg'
-end
 
 
 
