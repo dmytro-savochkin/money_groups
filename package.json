@@ -2,6 +2,7 @@
   "name": "money-groups",
   "version": "1.0.0",
   "dependencies": {
+    "tmp": "0.0.23",
     "bower": "~1.2"
   },
   "engine": {
