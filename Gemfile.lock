@@ -40,13 +40,6 @@ GEM
     bcrypt (3.1.10)
     bower-rails (0.10.0)
     builder (3.2.2)
-    coffee-rails (4.1.0)
-      coffee-script (>= 2.2.0)
-      railties (>= 4.0.0, < 5.0)
-    coffee-script (2.4.1)
-      coffee-script-source
-      execjs
-    coffee-script-source (1.9.1.1)
     devise (3.5.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -143,6 +136,9 @@ GEM
     tilt (2.0.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (2.7.1)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     warden (1.2.3)
       rack (>= 1.0)
 
@@ -151,7 +147,6 @@ PLATFORMS
 
 DEPENDENCIES
   bower-rails
-  coffee-rails
   devise
   haml
   jquery-rails
@@ -161,3 +156,4 @@ DEPENDENCIES
   rspec-rails
   sass (= 3.2.19)
   sqlite3
+  uglifier
