@@ -10,6 +10,7 @@ moneyGroupsApp.controller('usersController', function($scope, $http, $cookies, C
     $scope.editing = {}
     $scope.edited = {}
 
+
     $scope.getUsersList = function() {
         $http.get('/users.json', {params: {user: $scope.$parent.getAuthUserObjectFromCookies()}}).
             then(function(data, status) {
@@ -29,6 +30,7 @@ moneyGroupsApp.controller('usersController', function($scope, $http, $cookies, C
                 console.log('Unknown error: ', data, status)
             })
     }
+
 
     $scope.editUser = function(userId) {
         userId = parseInt(userId)
@@ -80,7 +82,6 @@ moneyGroupsApp.controller('usersController', function($scope, $http, $cookies, C
 
 
 
-
     function updateUserInSessionsController(updatedUser) {
         $scope.$parent.user.name = updatedUser.name
         $scope.$parent.user.money = updatedUser.money
@@ -90,6 +91,4 @@ moneyGroupsApp.controller('usersController', function($scope, $http, $cookies, C
         $cookies.put('user_name', updatedUser.name)
         $cookies.put('user_is_admin', updatedUser.admin)
     }
-
-
 })

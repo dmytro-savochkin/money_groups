@@ -30,7 +30,6 @@ class UsersController < ApplicationController
   end
 
 
-
 	def join_group
 		group = Group.find_by_id(params[:group_id])
 		membership = Membership.new(user_id: current_user.id, group_id: params[:group_id])

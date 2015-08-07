@@ -3,6 +3,7 @@ moneyGroupsApp.controller('groupsController', function($scope, $http, $cookies, 
         function(value) {if(value) $scope.getGroupsList()}
     )
 
+
     $scope.processing = false
     $scope.lastOperation = ''
     $scope.lastOperationVerb = ''
@@ -16,6 +17,7 @@ moneyGroupsApp.controller('groupsController', function($scope, $http, $cookies, 
     $scope.newGroupError = false
     $scope.editing = {}
     $scope.edited = {}
+
 
     $scope.getGroupsList = function() {
         $http.get('/groups.json', {params: {user: $scope.$parent.getAuthUserObjectFromCookies()}}).
@@ -155,7 +157,6 @@ moneyGroupsApp.controller('groupsController', function($scope, $http, $cookies, 
     }
 
 
-
     function setLastOperation(type) {
         $scope.lastOperation = type
         if(type == 'deposit') {
@@ -165,6 +166,7 @@ moneyGroupsApp.controller('groupsController', function($scope, $http, $cookies, 
             $scope.lastOperationVerb = 'withdrawn'
         }
     }
+
 
     function depositOrWithdraw(type, groupId) {
         $scope.processing = true
@@ -232,5 +234,4 @@ moneyGroupsApp.controller('groupsController', function($scope, $http, $cookies, 
             })
         $scope.processing = false
     }
-
 })

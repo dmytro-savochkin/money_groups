@@ -22,7 +22,6 @@ class RegistrationsController < ApplicationController
 	end
 
 
-
 	def edit
 		user = User.find_by_id(params[:user][:id])
 		render :json => {success: true,
@@ -39,6 +38,8 @@ class RegistrationsController < ApplicationController
 			render :json => {success: false, error: user.errors}
 		end
 	end
+
+
 
 
 	private

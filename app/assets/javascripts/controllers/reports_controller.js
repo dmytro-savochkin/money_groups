@@ -1,16 +1,4 @@
 moneyGroupsApp.controller('reportsController', function($scope, $http, $cookies, Store) {
-    $scope.users = {}
-    $scope.groups = {}
-    $scope.groupToMakeReportFor = undefined
-    $scope.userToMakeReportFor = undefined
-    $scope.reportShown = false
-    $scope.errors = {
-        groups: undefined,
-        users: undefined,
-        total: undefined
-    }
-    clearAllReports()
-
     $scope.$watch(function() { return Store.getData().groups },
         function(value) {
             if(!jQuery.isEmptyObject(value))
@@ -25,11 +13,18 @@ moneyGroupsApp.controller('reportsController', function($scope, $http, $cookies,
     )
 
 
+    $scope.users = {}
+    $scope.groups = {}
+    $scope.groupToMakeReportFor = undefined
+    $scope.userToMakeReportFor = undefined
+    $scope.reportShown = false
+    $scope.errors = {
+        groups: undefined,
+        users: undefined,
+        total: undefined
+    }
+    clearAllReports()
 
-
-    //get "/users/:user_id/report" => "users#report"
-    //get "/groups/:group_id/report" => "groups#report"
-    //get "/actions/report" => "actions#report"
 
     $scope.newReportByUser = function() {
         if($scope.userToMakeReportFor) {
@@ -39,12 +34,14 @@ moneyGroupsApp.controller('reportsController', function($scope, $http, $cookies,
         }
     }
 
+
     $scope.newReportByGroup = function() {
         if($scope.groupToMakeReportFor) {
             newReportByGroupOrUser('group', $scope.groupToMakeReportFor)
             $scope.reportShown = 'group'
         }
     }
+
 
     $scope.newTotalReport = function() {
         newReportByGroupOrUser('total')
@@ -84,6 +81,7 @@ moneyGroupsApp.controller('reportsController', function($scope, $http, $cookies,
         $scope.reportShown = type
     }
 
+
     function clearAllReports() {
         $scope.reports = {
             groups: undefined,
@@ -91,5 +89,4 @@ moneyGroupsApp.controller('reportsController', function($scope, $http, $cookies,
             total: undefined
         }
     }
-
 })

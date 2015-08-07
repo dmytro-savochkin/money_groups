@@ -1,10 +1,6 @@
 class ApplicationController < ActionController::Base
 	skip_before_action :verify_authenticity_token
-	# protect_from_forgery with: :null_session, if: Proc.new { |c|
-	# 	c.request.format == 'application/json' }
-
 	before_action :authenticate_user_from_token!
-
 
 
 	private
@@ -29,6 +25,7 @@ class ApplicationController < ActionController::Base
 			return
 		end
 	end
+
 
 	def authenticate_admin_from_token!
 		user = authenticate_user_from_token!

@@ -30,15 +30,14 @@ class GroupsController < ApplicationController
 	end
 
 
-
 	def deposit_money
 		deposit_or_withdraw_money(:deposit)
 	end
 
+
 	def withdraw_money
 		deposit_or_withdraw_money(:withdraw)
 	end
-
 
 
 	def report
@@ -52,7 +51,6 @@ class GroupsController < ApplicationController
 			render :json => {success: false, error: :group_not_found}
 		end
 	end
-
 
 
 
@@ -98,7 +96,6 @@ class GroupsController < ApplicationController
 			render :json => {success: false, error: e.message}
 		end
 	end
-
 
 
 	def render_wrong_amount

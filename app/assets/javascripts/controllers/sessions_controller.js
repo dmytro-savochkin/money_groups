@@ -16,7 +16,6 @@ moneyGroupsApp.controller('sessionsController', function($scope, $http, $cookies
     $scope.user.id = $cookies.get('user_id')
 
 
-
     $scope.registration = function() {
         $scope.status.registration.processing = true
         var usedFields = ['name', 'password', 'age']
@@ -42,8 +41,6 @@ moneyGroupsApp.controller('sessionsController', function($scope, $http, $cookies
             console.log('Unknown error: ', data, status)
         })
     }
-
-
 
 
     $scope.login = function() {
@@ -97,7 +94,6 @@ moneyGroupsApp.controller('sessionsController', function($scope, $http, $cookies
             console.log('Unknown error: ', data, status)
         })
     }
-
 
 
     $scope.logout = function() {

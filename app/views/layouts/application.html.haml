@@ -24,10 +24,11 @@
             %h1
               = @title + '.'
 
+
+
     .container-full
       .col-xs-1
-
-      %div.col-xs-10
+      .col-xs-10
         .row{'ng-show' => 'user.loggedIn'}
           .row
             %div.col-xs-12.well{'ng-show' => 'user.isAdmin', 'ng-controller' => 'reportsController'}
@@ -85,7 +86,7 @@
             %div.col-xs-1{'ng-show' => 'user.isAdmin'}
 
             %div{'ng-show' => 'user.loggedIn', 'ng-controller' => 'groupsController',
-                      'ng-class' => "{'col-xs-12': !user.isAdmin, 'col-xs-6': user.isAdmin}"}
+                'ng-class' => "{'col-xs-12': !user.isAdmin, 'col-xs-6': user.isAdmin}"}
               .row
                 .well
                   %a{name: :groups}
