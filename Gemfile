@@ -3,6 +3,7 @@ ruby "2.0.0"
 
 gem 'rails', '4.2.3'
 
+gem 'coffee-rails'
 gem 'jquery-rails'
 gem 'haml'
 gem 'devise'
@@ -16,6 +17,8 @@ group :development, :test do
 end
 
 group :assets do
+  # gem 'therubyracer'
+  # gem 'sass-rails', "  ~> 3.1.0"
   gem 'uglifier'
 end
 
